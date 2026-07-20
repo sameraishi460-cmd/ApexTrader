@@ -1,34 +1,152 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>USDT P2P Palestine</title>
+    <title>Pal P2P USDT</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+
+        .box {
+            background: white;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 10px;
+        }
+
+        button {
+            padding: 10px;
+            background: green;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+
+        a {
+            text-decoration: none;
+        }
+    </style>
+
 </head>
+
 <body>
 
-<h1>🇵🇸 USDT P2P Palestine</h1>
 
-<h2>إعلانات البيع والشراء</h2>
+<h1>🇵🇸 Pal P2P USDT</h1>
 
-<a href="/create_ad">إنشاء إعلان جديد</a>
+
+{% if session.user %}
+
+<p>
+مرحبا {{session.user}}
+</p>
+
+<a href="/create_ad">
+<button>
+إنشاء إعلان
+</button>
+</a>
+
+<a href="/logout">
+تسجيل خروج
+</a>
+
+
+{% else %}
+
+
+<a href="/login">
+<button>
+تسجيل دخول
+</button>
+</a>
+
+
+<a href="/register">
+<button>
+حساب جديد
+</button>
+</a>
+
+
+{% endif %}
+
+
 
 <hr>
 
-{% if ads %}
-    {% for ad in ads %}
-        <div>
-            <h3>{{ ad.type }}</h3>
-            <p>الكمية: {{ ad.amount }} USDT</p>
-            <p>السعر: {{ ad.price }} شيكل</p>
-            <p>طريقة الدفع: {{ ad.payment }}</p>
-            <p>صاحب الإعلان: {{ ad.user }}</p>
-        </div>
-        <hr>
-    {% endfor %}
+
+<h2>
+إعلانات USDT
+</h2>
+
+
+
+{% for ad in ads %}
+
+
+<div class="box">
+
+<h3>
+{{ad.type}}
+</h3>
+
+
+<p>
+👤 البائع:
+{{ad.user}}
+</p>
+
+
+<p>
+💰 الكمية:
+{{ad.amount}} USDT
+</p>
+
+
+<p>
+💵 السعر:
+{{ad.price}} شيكل
+</p>
+
+
+<p>
+💳 الدفع:
+{{ad.payment}}
+</p>
+
+
+
+<a href="/buy/{{ad.id}}">
+
+<button>
+شراء الآن
+</button>
+
+</a>
+
+
+
+</div>
+
+
 {% else %}
-    <p>لا توجد إعلانات حالياً.</p>
-{% endif %}
+
+<p>
+لا يوجد إعلانات حاليا
+</p>
+
+
+{% endfor %}
+
+
 
 </body>
+
 </html>
