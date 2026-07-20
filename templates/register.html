@@ -1,31 +1,109 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
+
 <head>
-    <meta charset="UTF-8">
-    <title>إنشاء حساب</title>
+
+<meta charset="UTF-8">
+<title>إنشاء حساب</title>
+
+<style>
+
+body {
+    font-family: Arial;
+    background:#f5f5f5;
+    padding:20px;
+}
+
+.box {
+    background:white;
+    padding:20px;
+    border-radius:10px;
+    max-width:400px;
+}
+
+input {
+    width:100%;
+    padding:10px;
+    margin:10px 0;
+}
+
+button {
+    width:100%;
+    padding:12px;
+    background:green;
+    color:white;
+    border:none;
+    border-radius:5px;
+}
+
+</style>
+
 </head>
+
+
 <body>
 
-<h1>إنشاء حساب جديد</h1>
+
+<h1>
+👤 إنشاء حساب جديد
+</h1>
+
+
+<div class="box">
+
 
 <form method="POST">
 
-<label>اسم المستخدم</label><br>
-<input type="text" name="username" required><br><br>
 
-<label>البريد الإلكتروني</label><br>
-<input type="email" name="email" required><br><br>
+<label>
+اسم المستخدم
+</label>
 
-<label>كلمة المرور</label><br>
-<input type="password" name="password" required><br><br>
+<input
+type="text"
+name="username"
+required>
 
-<button type="submit">إنشاء الحساب</button>
+
+<label>
+البريد الإلكتروني
+</label>
+
+<input
+type="email"
+name="email"
+required>
+
+
+<label>
+كلمة المرور
+</label>
+
+<input
+type="password"
+name="password"
+required>
+
+
+<button type="submit">
+إنشاء الحساب
+</button>
+
 
 </form>
 
+
 <br>
 
-<a href="/login">لدي حساب بالفعل</a>
+
+<a href="/login">
+لدي حساب بالفعل
+</a>
+
+
+</div>
+
 
 </body>
+
 </html>
