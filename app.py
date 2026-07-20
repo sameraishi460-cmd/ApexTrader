@@ -1,21 +1,25 @@
-# from flask import Flask, render_template, request, redirect, session
+from flask import Flask, render_template, request, redirect, session
 import sqlite3
 from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
-app.secret_key = "p2p_usdt_palestine"
+app.secret_key = "palp2p_secret_key"
 
 
-def connect():
-    db = sqlite3.connect("database.db")
-    db.row_factory = sqlite3.Row
-    return db
+# الاتصال بقاعدة البيانات
+def db():
+    conn = sqlite3.connect("database.db")
+    conn.row_factory = sqlite3.Row
+    return conn
 
 
+# إنشاء الجداول
 def init_db():
-    db = connect()
-    cur = db.cursor()
 
+    conn = db()
+    cur = conn.cursor()
+
+    # المستخدمين
     cur.execute("""
     CREATE TABLE IF NOT EXISTS users(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -25,6 +29,7 @@ def init_db():
     )
     """)
 
+    # الإعلانات
     cur.execute("""
     CREATE TABLE IF NOT EXISTS ads(
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -37,21 +42,56 @@ def init_db():
     )
     """)
 
-    db.commit()
-    db.close()
+    # الصفقات
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS trades(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        buyer TEXT,
+        seller TEXT,
+        amount REAL,
+        price REAL,
+        status TEXT,
+        fee REAL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+    """)
+
+    # العمولات
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS fees(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        trade_id INTEGER,
+        amount REAL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )
+    """)
 
 
+    conn.commit()
+    conn.close()
+
+
+
+# الصفحة الرئيسية
 @app.route("/")
 def home():
-    db = connect()
-    ads = db.execute(
+
+    conn = db()
+
+    ads = conn.execute(
         "SELECT * FROM ads WHERE status='OPEN'"
     ).fetchall()
-    db.close()
 
-    return render_template("index.html", ads=ads)
+    conn.close()
+
+    return render_template(
+        "index.html",
+        ads=ads
+    )
 
 
+
+# تسجيل حساب
 @app.route("/register", methods=["GET","POST"])
 def register():
 
@@ -59,56 +99,82 @@ def register():
 
         username = request.form["username"]
         email = request.form["email"]
+
         password = generate_password_hash(
             request.form["password"]
         )
 
-        db = connect()
+        conn = db()
 
         try:
-            db.execute(
-                "INSERT INTO users(username,email,password) VALUES(?,?,?)",
-                (username,email,password)
+
+            conn.execute(
+            """
+            INSERT INTO users
+            (username,email,password)
+            VALUES(?,?,?)
+            """,
+            (username,email,password)
             )
-            db.commit()
+
+            conn.commit()
 
         except:
+
             return "الإيميل مستخدم"
 
-        db.close()
+        conn.close()
 
         return redirect("/login")
+
 
     return render_template("register.html")
 
 
+
+
+# تسجيل دخول
 @app.route("/login", methods=["GET","POST"])
 def login():
 
-    if request.method == "POST":
+    if request.method=="POST":
 
         email=request.form["email"]
         password=request.form["password"]
 
-        db=connect()
+        conn=db()
 
-        user=db.execute(
-            "SELECT * FROM users WHERE email=?",
-            (email,)
+        user=conn.execute(
+        """
+        SELECT * FROM users
+        WHERE email=?
+        """,
+        (email,)
         ).fetchone()
 
-        db.close()
+        conn.close()
 
-        if user and check_password_hash(user["password"],password):
+
+        if user and check_password_hash(
+            user["password"],
+            password
+        ):
 
             session["user"]=user["username"]
+
             return redirect("/")
 
-        return "خطأ في البيانات"
+
+        return "بيانات خاطئة"
+
 
     return render_template("login.html")
 
 
+
+
+
+# إنشاء إعلان
 @app.route("/create_ad", methods=["GET","POST"])
 def create_ad():
 
@@ -118,35 +184,99 @@ def create_ad():
 
     if request.method=="POST":
 
-        ad_type=request.form["type"]
-        amount=request.form["amount"]
-        price=request.form["price"]
-        payment=request.form["payment"]
+        conn=db()
 
-
-        db=connect()
-
-        db.execute("""
+        conn.execute(
+        """
         INSERT INTO ads
         (user,type,amount,price,payment,status)
         VALUES(?,?,?,?,?,?)
         """,
         (
         session["user"],
-        ad_type,
-        amount,
-        price,
-        payment,
+        request.form["type"],
+        request.form["amount"],
+        request.form["price"],
+        request.form["payment"],
         "OPEN"
-        ))
+        )
+        )
 
-        db.commit()
-        db.close()
+
+        conn.commit()
+        conn.close()
 
         return redirect("/")
 
 
     return render_template("create_ad.html")
+
+
+
+
+
+# بدء صفقة شراء
+@app.route("/buy/<int:ad_id>")
+def buy(ad_id):
+
+    if "user" not in session:
+        return redirect("/login")
+
+
+    conn=db()
+
+
+    ad=conn.execute(
+    """
+    SELECT * FROM ads
+    WHERE id=?
+    """,
+    (ad_id,)
+    ).fetchone()
+
+
+    if not ad:
+        return "الإعلان غير موجود"
+
+
+
+    fee = ad["amount"] * 0.02
+
+
+    conn.execute(
+    """
+    INSERT INTO trades
+    (buyer,seller,amount,price,status,fee)
+    VALUES(?,?,?,?,?,?)
+    """,
+    (
+    session["user"],
+    ad["user"],
+    ad["amount"],
+    ad["price"],
+    "USDT_LOCKED",
+    fee
+    )
+    )
+
+
+    conn.execute(
+    """
+    UPDATE ads
+    SET status='CLOSED'
+    WHERE id=?
+    """,
+    (ad_id,)
+    )
+
+
+    conn.commit()
+    conn.close()
+
+
+    return "تم فتح الصفقة وحجز USDT"
+
+
 
 
 
@@ -156,6 +286,7 @@ def logout():
     session.clear()
 
     return redirect("/")
+
 
 
 
