@@ -1,28 +1,99 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
+
 <head>
-    <meta charset="UTF-8">
-    <title>تسجيل الدخول</title>
+
+<meta charset="UTF-8">
+<title>تسجيل الدخول</title>
+
+<style>
+
+body {
+    font-family: Arial;
+    background:#f5f5f5;
+    padding:20px;
+}
+
+.box {
+    background:white;
+    padding:20px;
+    border-radius:10px;
+    max-width:400px;
+}
+
+input {
+    width:100%;
+    padding:10px;
+    margin:10px 0;
+}
+
+button {
+    width:100%;
+    padding:12px;
+    background:#0066ff;
+    color:white;
+    border:none;
+    border-radius:5px;
+}
+
+</style>
+
 </head>
+
+
 <body>
 
-<h1>تسجيل الدخول</h1>
+
+<h1>
+🔐 تسجيل الدخول
+</h1>
+
+
+<div class="box">
+
 
 <form method="POST">
 
-<label>البريد الإلكتروني</label><br>
-<input type="email" name="email" required><br><br>
 
-<label>كلمة المرور</label><br>
-<input type="password" name="password" required><br><br>
+<label>
+البريد الإلكتروني
+</label>
 
-<button type="submit">دخول</button>
+<input 
+type="email"
+name="email"
+required>
+
+
+<label>
+كلمة المرور
+</label>
+
+<input
+type="password"
+name="password"
+required>
+
+
+<button type="submit">
+دخول
+</button>
+
 
 </form>
 
+
 <br>
 
-<a href="/register">إنشاء حساب جديد</a>
+
+<a href="/register">
+إنشاء حساب جديد
+</a>
+
+
+</div>
+
 
 </body>
+
 </html>
