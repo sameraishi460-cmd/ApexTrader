@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>USDT P2P Palestine</title>
+</head>
+<body>
+
+<h1>🇵🇸 USDT P2P Palestine</h1>
+
+<h2>إعلانات البيع والشراء</h2>
+
+<a href="/create_ad">إنشاء إعلان جديد</a>
+
+<hr>
+
+{% if ads %}
+    {% for ad in ads %}
+        <div>
+            <h3>{{ ad.type }}</h3>
+            <p>الكمية: {{ ad.amount }} USDT</p>
+            <p>السعر: {{ ad.price }} شيكل</p>
+            <p>طريقة الدفع: {{ ad.payment }}</p>
+            <p>صاحب الإعلان: {{ ad.user }}</p>
+        </div>
+        <hr>
+    {% endfor %}
+{% else %}
+    <p>لا توجد إعلانات حالياً.</p>
+{% endif %}
+
+</body>
+</html>
